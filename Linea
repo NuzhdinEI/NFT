@@ -1,0 +1,38 @@
+// Example: Simple NFT minting smart contract on Linea or Ethereum-compatible chain
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract LineaNFT is ERC721, Ownable {
+    uint256 public nextTokenId;
+    uint256 public constant MAX_SUPPLY = 1000;
+    string private _baseTokenURI;
+
+    constructor(string memory baseURI) ERC721("LineaNFT", "LNFT") {
+        _baseTokenURI = baseURI;
+    }
+
+    function mint() external {
+        require(nextTokenId < MAX_SUPPLY, "Max supply reached");
+        _safeMint(msg.sender, nextTokenId);
+        nextTokenId++;
+    }
+
+    function setBaseURI(string calldata baseURI) external onlyOwner {
+        _baseTokenURI = baseURI;
+    }
+
+    function _baseURI() internal view override returns (string memory) {
+        return _baseTokenURI;
+    }
+}
+
+// To deploy:
+// 1. Compile with Hardhat or Foundry
+// 2. Deploy to Ethereum or Linea (e.g. via Alchemy, Infura, or MetaMask)
+// 3. Use mint() to allow users to mint NFTs until max supply is reached
+
+// Optional: Frontend with ethers.js or viem + wagmi for mint button
